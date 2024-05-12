@@ -94,7 +94,7 @@ export const FileUpLoadItem = memo(
         case "success":
           return <Check width={16} height={16} color={CURRENT_COLOR} />;
         case "error":
-          return <Error width={16} height={16} color={"#FF8080"} />;
+          return <Error width={20} height={20} color={"#FF8080"} />;
         default:
           return null;
       }
@@ -114,7 +114,7 @@ export const FileUpLoadItem = memo(
         >
           <div style={{ display: "flex", justifyContent: "space-between" }}>
             <span style={{ fontSize: "0.8rem" }}>
-              {file.fileName} - {Math.round(file.size / 1024)}KB - {file.type}
+              {file.fileName} - {Math.round(file.size / 1024)}KB
             </span>
             <div className="status">{renderStatus()}</div>
           </div>
