@@ -8,7 +8,7 @@ import "./App.css";
 import { FileUpLoadItem } from "./components/FileUpLoadItem";
 import { CountFileUploads } from "./components/CountFileUploads";
 import { Header } from "./components/Header";
-import { FilePreviewItem } from "./components/FilePreviewIten";
+import { FilePreviewItem } from "./components/FilePreviewItem";
 
 const readFile = async (file) => {
   return new Promise((resolve, reject) => {
@@ -27,26 +27,24 @@ export default function App() {
   const [files, setFiles] = useState([]);
   const [isUpload, setIsUpload] = useState(false);
   const [uploadingCount, setUploadCount] = useState(0);
-  const onDrop = useCallback(
-    async (acceptedFiles) => {
-      const filesPreview = [];
 
-      for (const file of acceptedFiles) {
-        const src = await readFile(file);
-        filesPreview.push({
-          src,
-          fileName: file.name,
-          type: file.type,
-          size: file.size,
-          id: uuidv4(),
-          file,
-        });
-      }
+  const onDrop = async (acceptedFiles) => {
+    const filesPreview = [];
 
-      setFiles([...files, ...filesPreview]);
-    },
-    [files]
-  );
+    for (const file of acceptedFiles) {
+      const src = await readFile(file);
+      filesPreview.push({
+        src,
+        fileName: file.name,
+        type: file.type,
+        size: file.size,
+        id: uuidv4(),
+        file,
+      });
+    }
+
+    setFiles([...files, ...filesPreview]);
+  };
 
   const { getRootProps, getInputProps, isDragAccept } = useDropzone({
     onDrop,
@@ -56,30 +54,39 @@ export default function App() {
     },
   });
 
-  const onRemoveImage = (index) => () => {
-    const newFiles = [...files];
-    newFiles.splice(index, 1);
-    setFiles(newFiles);
-  };
+  const onRemoveImage = useCallback(
+    (index) => () => {
+      const newFiles = [...files];
+      newFiles.splice(index, 1);
+      setFiles(newFiles);
+    },
+    [files]
+  );
 
-  const onUpload = () => {
+  const onUpload = useCallback(() => {
     setIsUpload(!isUpload);
     setUploadCount(0);
     if (isUpload) setFiles([]);
-  };
+  }, [isUpload]);
 
-  const onDone = (index) => (status) => {
-    const newFiles = [...files];
-    newFiles[index].status = status;
-    setFiles(newFiles);
-    setUploadCount((prev) => prev + 1);
-  };
+  const onDone = useCallback(
+    (index) => (status) => {
+      const newFiles = [...files];
+      newFiles[index].status = status;
+      setFiles(newFiles);
+      setUploadCount((prev) => prev + 1);
+    },
+    [files]
+  );
 
-  const handleCancel = (index) => () => {
-    const newFiles = [...files];
-    newFiles[index].status = "error";
-    setFiles(newFiles);
-  };
+  const handleCancel = useCallback(
+    (index) => () => {
+      const newFiles = [...files];
+      newFiles[index].status = "error";
+      setFiles(newFiles);
+    },
+    [files]
+  );
 
   const isHasFiles = !!files.length;
 

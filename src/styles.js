@@ -1,5 +1,6 @@
 import styled from "styled-components";
 export const CURRENT_COLOR = "#a87676";
+export const ERROR_COLOR = "#FF8080";
 
 const Container = styled.main`
   max-width: 1280px;

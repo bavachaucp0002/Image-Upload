@@ -1,13 +1,14 @@
 import { memo, useState, useRef, useEffect } from "react";
 import axios from "axios";
 import styled from "styled-components";
-import { CURRENT_COLOR } from "../styles";
+import { CURRENT_COLOR, ERROR_COLOR } from "../styles";
 import { ReactComponent as Check } from "../assets/icons/check.svg";
 import { ReactComponent as Error } from "../assets/icons/error.svg";
 import { ReactComponent as Close } from "../assets/icons/close.svg";
 
 export const FileUpLoadItem = memo(
   ({ file, onDone, canUpload, handleCancel }) => {
+    console.log("re-render");
     const [status, setStatus] = useState("loading");
     const [errMessage, setErrMessage] = useState("");
     const [url, setUrl] = useState("");
@@ -67,6 +68,10 @@ export const FileUpLoadItem = memo(
       };
 
       if (canUpload) upload();
+
+      return () => {
+        refAbortUpload?.current?.abort();
+      };
     }, [canUpload]);
 
     const renderStatus = () => {
@@ -78,7 +83,7 @@ export const FileUpLoadItem = memo(
                 className="remove"
                 width={16}
                 height={16}
-                color="#FF8080"
+                color={ERROR_COLOR}
                 onClick={onCancel}
               />
             );
@@ -94,7 +99,7 @@ export const FileUpLoadItem = memo(
         case "success":
           return <Check width={16} height={16} color={CURRENT_COLOR} />;
         case "error":
-          return <Error width={20} height={20} color={"#FF8080"} />;
+          return <Error width={20} height={20} color={ERROR_COLOR} />;
         default:
           return null;
       }
@@ -121,13 +126,16 @@ export const FileUpLoadItem = memo(
 
           <ProgressStyle value={progress} isError={isError} />
           {isError && (
-            <p style={{ fontSize: "0.6rem", color: "#FF8080" }}>{errMessage}</p>
+            <p style={{ fontSize: "0.6rem", color: ERROR_COLOR }}>
+              {errMessage}
+            </p>
           )}
           {url && (
             <a
               href={url}
               target="_blank"
               style={{ fontSize: "0.6rem", color: CURRENT_COLOR }}
+              rel="noreferrer"
             >
               {url}
             </a>
@@ -176,7 +184,8 @@ const ProgressStyle = styled.div`
     content: "";
     width: ${({ value }) => `${value}%`};
     height: 100%;
-    background-color: ${({ isError }) => (isError ? "#FF8080" : CURRENT_COLOR)};
+    background-color: ${({ isError }) =>
+      isError ? ERROR_COLOR : CURRENT_COLOR};
     border-radius: 5px;
     position: absolute;
     transition: all 0.1s;
